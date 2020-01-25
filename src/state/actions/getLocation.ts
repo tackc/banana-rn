@@ -8,8 +8,7 @@ export const getLocation = async store => {
 		await store.setState({ coords });
 		return coords;
 	}
-	return {
-		latitude: null,
-		longitude: null,
-	};
+	const coords = { latitude: null, longitude: null };
+	await store.setState({ coords });
+	return coords;
 };
