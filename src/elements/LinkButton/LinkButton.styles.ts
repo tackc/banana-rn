@@ -22,4 +22,10 @@ export default StyleSheet.create({
 	pressed: {
 		color: 'white',
 	},
+	activityIndicatorContainer: {
+		position: 'absolute',
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
 });

@@ -1,15 +1,18 @@
 import React from 'react';
 import { useNavigation } from 'react-navigation-hooks';
-import { View, Text } from 'react-native';
+import { View, Text, ActivityIndicator } from 'react-native';
 import styles from './LinkButton.styles';
 
 interface LinkButtonProps {
-	text: string;
 	destination?: string;
 	onPress?: (any) => void;
+	hasPendingAction?: boolean;
+	text: string;
 }
 
-export default ({ text, destination, onPress }: LinkButtonProps) => {
+export default ({
+	text, destination, onPress, hasPendingAction,
+}: LinkButtonProps) => {
 	const { navigate } = useNavigation();
 	const buttonFunction = destination
 		? () => navigate(destination)
@@ -20,11 +23,16 @@ export default ({ text, destination, onPress }: LinkButtonProps) => {
 			<View style={styles.textContainer}>
 				<Text
 					style={styles.text}
-					onPress={buttonFunction}
+					onPress={hasPendingAction ? undefined : buttonFunction}
 				>
 					{text.toUpperCase()}
 				</Text>
 			</View>
+			{ hasPendingAction && (
+				<View style={styles.activityIndicatorContainer}>
+					<ActivityIndicator size="large" color="white" />
+				</View>
+			)}
 		</View>
 	);
 };

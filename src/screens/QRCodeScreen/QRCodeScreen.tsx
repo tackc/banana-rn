@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import {
-	AppRegistry,
 	View,
 	TextInput,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-
 import styles from './QRCodeScreen.styles';
 
 export default ({ QRString }: { QRString?: string }) => {

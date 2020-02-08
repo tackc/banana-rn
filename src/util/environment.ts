@@ -6,6 +6,7 @@ const DONOR = {
 
 const CLIENT = {
 	LOGIN_URL: '/client_auth',
+	MAP_OR_LIST_VIEW: 'map',
 };
 
 const getEnv = () => {

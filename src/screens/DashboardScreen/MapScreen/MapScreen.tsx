@@ -17,7 +17,7 @@ import {
 	InputLabel,
 } from '@elements';
 import * as colors from '@util/colors';
-import styles from './DonationScreen.styles';
+import styles from './MapScreen.styles';
 
 export default () => {
 	const [ state, actions ] = useGlobal() as any;

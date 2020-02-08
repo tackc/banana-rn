@@ -1,6 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigation, useNavigationParam } from 'react-navigation-hooks';
-import { View, Alert, TextInput } from 'react-native';
+import { Notifications } from 'expo';
+import * as Permissions from 'expo-permissions';
+import {
+	View,
+	Alert,
+	TextInput,
+	ScrollView,
+	KeyboardAvoidingView,
+	Platform,
+} from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import useGlobal from '@state';
 import {
@@ -12,19 +21,34 @@ import {
 } from '@elements';
 import styles from './LoginScreen.styles';
 
+const registerForPushNotificationsAsync = async () => {
+	const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+	console.log({ status })
+	if (status !== 'granted') {
+		alert('No notification permissions!');
+		return;
+	}
+	const token = await Notifications.getExpoPushTokenAsync();
+	console.log('old token: ExponentPushToken[RNG-gRDW5Vli9nsS29HxXx]')
+	console.log('new token', token)
+};
+
 export default () => {
 	const { navigate } = useNavigation();
 	const [ state, actions ] = useGlobal() as any;
 	const { userIdentity } = state;
 	const { logIn } = actions;
 
-	const [ email, setEmail ] = useState(useNavigationParam('email') ?? '');
-	const [ password, setPassword ] = useState(useNavigationParam('password') ?? '');
+	const [ email, setEmail ] = useState(useNavigationParam('email') ?? 'client@client.com');
+	const [ password, setPassword ] = useState(useNavigationParam('password') ?? 'client');
 	const [ hidePwd, setHidePwd ] = useState(true);
+	const [ isLoggingIn, setIsLoggingIn ] = useState(false);
 
 	const clearEmailAndPassword = () => { setEmail(''); setPassword(''); };
 
 	const handleLogin = async () => {
+		setIsLoggingIn(true);
+		registerForPushNotificationsAsync();
 		const statusCode = await logIn({ email, password });
 		switch (statusCode) {
 			case 202: {
@@ -32,15 +56,18 @@ export default () => {
 				navigate('LoginSuccessScreen');
 				return;
 			}
-			case 401: Alert.alert('Incorrect email or password'); return;
-			case 404: Alert.alert('Server not found - please try again'); return;
-			case 500: Alert.alert('Network error - please try again'); return;
+			case 401: Alert.alert('Incorrect email or password'); break;
+			case 404: Alert.alert('Server not found - please try again'); break;
+			case 500: Alert.alert('Network error - please try again'); break;
 			default: Alert.alert(`Server replied with ${statusCode} status code`);
 		}
+		setIsLoggingIn(false);
 	};
 
 	return (
-		<View style={styles.outerContainer}>
+		// <KeyboardAvoidingView behavior={Platform.select({ ios: 'padding', android: undefined })} style={styles.outerContainer}>
+		<KeyboardAvoidingView behavior="padding" style={styles.outerContainer}>
+		{/* <ScrollView style={styles.outerContainer} keyboardDismissMode="on-drag" keyboardShouldPersistTaps="never"> */}
 			<SpacerInline height={140} />
 			<Title text={`I am a ${userIdentity}.`} />
 			<SpacerInline height={40} />
@@ -51,8 +78,6 @@ export default () => {
 				style={styles.input}
 				autoCapitalize="none"
 				autoCorrect={false}
-				autoFocus={true}
-				blurOnSubmit={false}
 			/>
 			<InputLabel text="Password" />
 			<View style={styles.passwordContainer}>
@@ -76,9 +101,12 @@ export default () => {
 				</View>
 			</View>
 			<SpacerInline height={40} />
-			<LinkButton text="Log In" onPress={() => handleLogin()} />
+
+			<LinkButton text="Log In" onPress={handleLogin} hasPendingAction={isLoggingIn} />
 			<SpacerInline height={10} />
+
 			<LinkButton text="Register" destination="RegistrationScreen" />
-		</View>
+		{/* </ScrollView> */}
+		</KeyboardAvoidingView>
 	);
 };

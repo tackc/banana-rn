@@ -55,6 +55,7 @@ export interface InitialState {
 	jwt?: string;
 	user?: DonorState | ClientState | SharedProps;
 	donationsOrClaims?: Donation[] | Claim[];
+	mapOrListView?: 'map' | 'list';
 }
 
 export interface StatusCode {

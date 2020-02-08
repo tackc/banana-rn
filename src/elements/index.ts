@@ -3,5 +3,8 @@ export { Header } from './Header';
 export { Icon } from './Icon';
 export { InputLabel } from './FormTextInput/InputLabel';
 export { LinkButton } from './LinkButton';
+export { MapNavigationButton } from './MapNavigationButton';
+export { MenuDrawer } from './MenuDrawer';
 export { SpacerInline } from './SpacerInline';
+export { SvgImage } from './SvgImage';
 export { Title } from './Title';

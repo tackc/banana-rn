@@ -13,7 +13,7 @@ import { SpacerInline } from '@elements';
 import styles from './MenuDrawer.styles';
 
 const MenuDrawer = props => {
-	const [ state, actions ] = useGlobal() as any;
+	const [ _state, actions ] = useGlobal() as any;
 	const { navigate, toggleDrawer } = useNavigation();
 	const { logOut } = actions;
 	const loginScreen = 'LoginScreen';

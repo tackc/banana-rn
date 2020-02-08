@@ -17,9 +17,7 @@ import ContactScreen from '../screens/ContactScreen';
 import LoginSuccessScreen from '../screens/LoginSuccessScreen';
 import DonationScreen from '../screens/DashboardScreen/DonationScreen';
 import QRCodeScannerScreen from '../screens/QRCodeScannerScreen/QRCodeScannerScreen';
-
-import MenuDrawer from '../elements/MenuDrawer/MenuDrawer';
-import SvgImage from '../elements/SvgImage/SvgImage';
+import { MenuDrawer, SvgImage } from '../elements';
 
 // Logged-In Screens for Drawer Navigator
 export const MainStack = createStackNavigator(

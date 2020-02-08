@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigation } from 'react-navigation-hooks';
 import { View, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Icon } from '@elements';
+import { Icon, MapNavigationButton } from '@elements';
 import HamburgerPopupMenu from '../HamburgerPopupMenu';
 
 import styles from './Header.styles';
@@ -10,6 +10,7 @@ import styles from './Header.styles';
 interface HeaderProps {
 	backButtonText?: string;
 	backDestination?: string;
+	includeMapNavigation?: boolean;
 	showBackButton?: boolean;
 	showMenu?: boolean;
 }
@@ -17,6 +18,7 @@ interface HeaderProps {
 export default ({
 	backButtonText = 'Back',
 	backDestination,
+	includeMapNavigation = false,
 	showBackButton = true,
 	showMenu = true,
 }: HeaderProps) => {
@@ -31,12 +33,16 @@ export default ({
 						style={{ flexDirection: 'row', alignItems: 'center' }}
 					>
 						<Icon name="chevron-left" />
-						<Text style={styles.backButtonLabel}>
-							{backButtonText}
-						</Text>
 					</TouchableOpacity>
 				)}
 			</View>
+
+			{ includeMapNavigation && (
+				<View style={styles.mapNavigationContainer}>
+					<MapNavigationButton title="map" />
+					<MapNavigationButton title="list" />
+				</View>
+			)}
 
 			<View>
 				{ showMenu && (

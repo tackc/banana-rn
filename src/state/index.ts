@@ -9,7 +9,8 @@ const {
 	USER_IDENTITY,
 	API_BASE_URL,
 	LOGIN_URL,
-} = getEnv();
+	MAP_OR_LIST_VIEW,
+} = getEnv() as any;
 
 export const initialState: InitialState = {
 	userIdentity: USER_IDENTITY,
@@ -18,6 +19,7 @@ export const initialState: InitialState = {
 	donationsOrClaims: [],
 	jwt: undefined,
 	user: undefined,
+	mapOrListView: 'map',
 };
 
 // Paste the following into your code to use global state & actions:

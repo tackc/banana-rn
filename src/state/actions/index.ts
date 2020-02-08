@@ -9,12 +9,14 @@ export interface Actions {
 	postDonation: () => Promise<StatusCode>;
 	register: () => Promise<StatusCode>;
 	scan: () => Promise<StatusCode>;
+	setMapOrListView: () => void;
 }
+
 export { getActiveDonationsForClient } from './getActiveDonationsForClient';
 export { getDonationsOrClaims } from './getDonationsOrClaims';
 export { getLocation } from './getLocation';
 export { logIn, logOut } from './auth';
+export { setMapOrListView } from './navigation';
 export { postDonation } from './postDonation';
 export { register } from './register';
 export { scan } from './scan';
-

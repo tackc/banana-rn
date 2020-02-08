@@ -100,7 +100,7 @@ export default () => {
 		});
 		switch (statusCode) {
 			case (201 || 202): Alert.alert('Registration complete! Please log in to continue.'); navigate('LoginScreen', { email, password }); return;
-			case 406: Alert.alert('Error: not accepted'); return;
+			case 422: Alert.alert('Error: not accepted'); return;
 			case 500: Alert.alert('Internal server error, please try again later.'); return;
 			default: Alert.alert("Sorry, that didn't work, please try again later."); console.log(statusCode);
 		}

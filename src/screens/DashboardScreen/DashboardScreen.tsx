@@ -6,31 +6,40 @@ import useGlobal from '@state';
 import { Title, SpacerInline, Header } from '@elements';
 import DonationsOrClaims from './DonationsOrClaims';
 import styles from './DashboardScreen.styles';
+import MapScreen from './MapScreen/MapScreen';
 
 const DashboardScreen = () => {
 	const { navigate } = useNavigation();
 	const [ state ] = useGlobal();
-	const { userIdentity } = state;
+	const { userIdentity, mapOrListView } = state;
 	const title = userIdentity === 'donor' ? 'My Donations.' : 'Open Donations.';
+
+	const DashboardContentChooser = () => {
+		if (userIdentity === 'donor') { return <DonationsOrClaims resource="donations" />; }
+		if (mapOrListView === 'map') { return <MapScreen />; }
+		return <DonationsOrClaims resource="donations" />;
+	};
 
 	return (
 		<View style={styles.outerContainer}>
 			<View>
-				<Header showBackButton={false} />
+				<Header showBackButton={false} includeMapNavigation={userIdentity === 'client'} />
 				<Title text={title} />
 				<SpacerInline height={20} />
 			</View>
 
-			<DonationsOrClaims resource="donations" />
+			<DashboardContentChooser />
 
 			{ userIdentity === 'donor' && (
 				<View style={styles.addButton}>
 					<TouchableOpacity
 						onPress={() => navigate('DonationScreen', {})}
 					>
-						<Text style={styles.plus}>
-							+
-						</Text>
+						<View>
+							<Text style={styles.plus}>
+								+
+							</Text>
+						</View>
 					</TouchableOpacity>
 				</View>
 			)}
