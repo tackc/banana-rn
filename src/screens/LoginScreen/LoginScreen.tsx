@@ -23,14 +23,11 @@ import styles from './LoginScreen.styles';
 
 const registerForPushNotificationsAsync = async () => {
 	const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-	console.log({ status })
 	if (status !== 'granted') {
-		alert('No notification permissions!');
+		Alert.alert('No notification permissions!');
 		return;
 	}
 	const token = await Notifications.getExpoPushTokenAsync();
-	console.log('old token: ExponentPushToken[RNG-gRDW5Vli9nsS29HxXx]')
-	console.log('new token', token)
 };
 
 export default () => {
@@ -54,7 +51,7 @@ export default () => {
 			case 202: {
 				await clearEmailAndPassword();
 				navigate('LoginSuccessScreen');
-				return;
+				break;
 			}
 			case 401: Alert.alert('Incorrect email or password'); break;
 			case 404: Alert.alert('Server not found - please try again'); break;
@@ -65,9 +62,7 @@ export default () => {
 	};
 
 	return (
-		// <KeyboardAvoidingView behavior={Platform.select({ ios: 'padding', android: undefined })} style={styles.outerContainer}>
 		<KeyboardAvoidingView behavior="padding" style={styles.outerContainer}>
-		{/* <ScrollView style={styles.outerContainer} keyboardDismissMode="on-drag" keyboardShouldPersistTaps="never"> */}
 			<SpacerInline height={140} />
 			<Title text={`I am a ${userIdentity}.`} />
 			<SpacerInline height={40} />
@@ -106,7 +101,6 @@ export default () => {
 			<SpacerInline height={10} />
 
 			<LinkButton text="Register" destination="RegistrationScreen" />
-		{/* </ScrollView> */}
 		</KeyboardAvoidingView>
 	);
 };

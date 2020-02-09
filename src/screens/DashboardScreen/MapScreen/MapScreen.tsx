@@ -1,212 +1,82 @@
-import React, { useState } from 'react';
-import { useNavigation, useNavigationParam } from 'react-navigation-hooks';
+import React, { useRef, useState, useEffect } from 'react';
 import {
 	View,
-	Text,
-	TouchableOpacity,
-	Image,
-	Alert,
 } from 'react-native';
-import { Switch } from 'react-native-paper';
+import MapView, { PROVIDER_DEFAULT, Marker, LatLng } from 'react-native-maps';
 import useGlobal from '@state';
+import { Donation } from '@state/index.types';
 import {
 	Header,
-	SpacerInline,
-	FormTextInput,
-	LinkButton,
-	InputLabel,
+	Title,
 } from '@elements';
 import * as colors from '@util/colors';
 import styles from './MapScreen.styles';
+import MapMarker from './MapMarker';
 
 export default () => {
+	const map = useRef<MapView | null>(null);
 	const [ state, actions ] = useGlobal() as any;
-	const { user, jwt } = state;
-	const { postDonation, logOut, getDonationsOrClaims } = actions;
-	const { navigate } = useNavigation();
-	const donation = useNavigationParam('donation');
-	const edit = useNavigationParam('edit');
-	const donationId = useNavigationParam('id') || null;
+	const { user: { coords }, donations } = state;
+	const [ hasUserLocation, setHasUserLocation ] = useState<boolean>(!!coords);
+	const [ hasActiveDonations, setHasActiveDonations ] = useState<boolean>(donations.length > 0);
+	const { getLocation, getActiveDonationsForClient } = actions;
 
-	const {
-		claims = '',
-		created_at = new Date(),
-		duration_minutes = 60,
-		food_name = '',
-		image_url = '',
-		measurement = '',
-		per_person = '',
-		pickup_location = state.user.pickup_location || '',
-		total_servings = '',
-	} = donation || {};
-
-	const [ name, setName ] = useState(food_name);
-	const [ durationInMinutes, setDurationInMinutes ] = useState(60);
-	const [ totalServings, setTotalServings ] = useState(total_servings);
-	const [ servingName, setServingName ] = useState(measurement);
-	const [ perPerson, setPerPerson ] = useState(per_person);
-	const [ pickupLocation, setPickupLocation ] = useState(pickup_location);
-	const [ cancel, setCancel ] = useState(false);
-	const [ stop, setStop ] = useState(false);
-
-	const icon = require('@assets/images/banana-icon.png');
-
-	const submitDonation = async () => {
-		if (!name) { Alert.alert('Please add the name of your donation.'); return; }
-		if (/[^a-z\s]/i.test(name)) { Alert.alert('Please enter a donation name with letters only.'); return; }
-		if (!servingName) { Alert.alert('Please add a serving name.'); return; }
-		if (/[^a-z\s]/i.test(servingName)) { Alert.alert('Please enter a serving name with letters only.'); return; }
-		if (!totalServings || totalServings < 0) { Alert.alert('Please add at least one total serving.'); return; }
-		if (!perPerson || perPerson < 0) { Alert.alert('Please add at least one per person.'); return; }
-		if (!pickupLocation) { Alert.alert('Please enter a pickup location.'); return; }
-
-		const donationProps = {
-			donationId, donorId: user.id, jwt, name, durationInMinutes, totalServings, servingName, perPerson, pickupLocation, cancel,
-		};
-		if (!donationId) { delete donationProps.donationId; }
-		const statusCode = await postDonation(donationProps);
-		switch (statusCode) {
-			case 201: Alert.alert('Donation created!'); getDonationsOrClaims(); navigate('LoginSuccessScreen'); return;
-			case 202: Alert.alert('Donation updated!'); getDonationsOrClaims(); navigate('LoginSuccessScreen'); return;
-			case (400 || 422): Alert.alert('Bad data - sorry, please try again!'); return;
-			case (401 || 403): Alert.alert('Authentication error - please log in again.'); logOut(); navigate('LoginScreen'); return;
-			case 404: Alert.alert('Network error - sorry, please try again!'); return;
-			case 500: Alert.alert('Server problem - sorry, please try again!'); return;
-			default: Alert.alert('Sorry, something went wrong. Please try again.');
+	const animateTo = ({ latitude, longitude }: LatLng) => {
+		if (latitude && longitude) {
+			const newCamera = { center: { latitude, longitude }, altitude: 10000, zoom: 14 };
+			map?.current?.animateCamera(newCamera, { duration: 1500 });
 		}
 	};
 
-	const toggleCancel = () => {
-		setCancel(!cancel); setStop(false);
+	const onMapReady = async () => {
+		setTimeout(() => {
+			animateTo(coords);
+		}, 1000);
 	};
-	const toggleStop = () => {
-		setStop(!stop); setCancel(false);
+
+	const getUserLocation = async () => {
+		const { latitude, longitude } = await getLocation();
+		await setHasUserLocation(!!latitude && !!longitude);
 	};
+
+	const getActiveDonations = async () => {
+		const newDonations = await getActiveDonationsForClient();
+		await setHasActiveDonations(newDonations !== []);
+	};
+
+	useEffect(() => {
+		if (!hasUserLocation) {
+			getUserLocation();
+		}
+		if (!hasActiveDonations) {
+			getActiveDonations();
+		}
+	}, []);
 
 	return (
 		<View style={styles.outerContainer}>
-			<View>
-				<Header showMenu={false} />
-				<SpacerInline height={20} />
-
-				<View style={styles.iconRow}>
-					<View style={styles.iconContainer}>
-						<Image source={icon} style={styles.icon} />
-					</View>
-					<FormTextInput
-						text="Donating:"
-						value={name}
-						setValue={setName}
-						width="50%"
-					/>
-				</View>
-
-				<SpacerInline height={40} />
-				<View>
-					<InputLabel text="Time limit" />
-					<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-						<TouchableOpacity
-							onPress={() => setDurationInMinutes(30)}
-							style={{
-								...styles.timeLimitButton,
-								borderColor: durationInMinutes === 30 ? 'white' : colors.BANANA_YELLOW,
-							}}
-						>
-							<Text style={styles.buttonText}>30 MIN</Text>
-						</TouchableOpacity>
-
-						<TouchableOpacity
-							onPress={() => setDurationInMinutes(60)}
-							style={{
-								...styles.timeLimitButton,
-								borderColor: durationInMinutes === 60 ? 'white' : colors.BANANA_YELLOW,
-							}}
-						>
-							<Text style={styles.buttonText}>60 MIN</Text>
-						</TouchableOpacity>
-					</View>
-					<SpacerInline height={20} />
-
-					<Text style={styles.infoText}>
-						How are they divided up?
-					</Text>
-
-					<FormTextInput
-						text="Serving name (bunch, etc.)"
-						value={servingName}
-						setValue={setServingName}
-						inline={true}
-						width="40%"
-						upperCase={false}
-					/>
-
-					<FormTextInput
-						text="# per person"
-						value={perPerson && perPerson.toString()}
-						setValue={setPerPerson}
-						inline={true}
-						width="20%"
-						upperCase={false}
-					/>
-
-					<FormTextInput
-						text="Total # of servings"
-						value={totalServings && totalServings.toString()}
-						setValue={setTotalServings}
-						inline={true}
-						width="20%"
-						upperCase={false}
-					/>
-
-					<FormTextInput
-						text="Pickup spot"
-						value={pickupLocation}
-						setValue={setPickupLocation}
-						inline={true}
-						width="60%"
-						upperCase={false}
-					/>
-				</View>
-			</View>
-
-			{ edit && (
-				<>
-					<View style={{ flexDirection: 'column' }}>
-						<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-							<InputLabel text="Cancel donation?" />
-							<Switch value={cancel} onValueChange={toggleCancel} color={colors.NAVY_BLUE} />
-						</View>
-						<Text style={styles.infoText}>Any outstanding claims will also be canceled.</Text>
-					</View>
-
-					<View>
-						<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-							<InputLabel text="Stop donation?" />
-							<Switch value={stop} onValueChange={toggleStop} color={colors.NAVY_BLUE} />
-						</View>
-						<Text style={styles.infoText}>Existing claims will still be fulfilled, but the donation will become inactive.</Text>
-					</View>
-				</>
+			{ hasUserLocation && (
+				<MapView
+					ref={map}
+					provider={PROVIDER_DEFAULT}
+					onMapReady={onMapReady}
+					loadingEnabled={true}
+					loadingBackgroundColor="gray"
+					loadingIndicatorColor={colors.BANANA_YELLOW}
+					showsUserLocation={true}
+					style={styles.mapView}
+					rotateEnabled={false}
+				>
+					{ hasActiveDonations && donations.map(donation => (
+						<Marker coordinate={donation.coords} key={donation.created_at}>
+							<MapMarker {...donation} />
+						</Marker>
+					))}
+				</MapView>
 			)}
-
-			<View style={styles.createContainer}>
-				{
-					edit
-						? (
-							<LinkButton
-								text="Save Changes"
-								onPress={submitDonation}
-							/>
-						)
-						: (
-							<LinkButton
-								text="Create"
-								onPress={submitDonation}
-							/>
-						)
-				}
-
-				<SpacerInline height={40} />
+			<View style={styles.header}>
+				<Header includeMapNavigation={true} showBackButton={false} />
+				<Title text="Donations" />
 			</View>
 		</View>
 	);

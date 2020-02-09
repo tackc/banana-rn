@@ -1,6 +1,8 @@
 import { StyleSheet } from 'react-native';
 import * as colors from '@util/colors';
 
+const activityIndicatorSize = 46;
+
 export default StyleSheet.create({
 	container: {
 		height: 35,
@@ -27,5 +29,9 @@ export default StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
+		backgroundColor: 'white',
+		width: activityIndicatorSize,
+		height: activityIndicatorSize,
+		borderRadius: activityIndicatorSize / 2,
 	},
 });

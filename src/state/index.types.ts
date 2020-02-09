@@ -1,3 +1,5 @@
+import { LatLng } from 'react-native-maps';
+
 export interface DonorState {
 	organization_name: string;
 	business_license: string;
@@ -5,8 +7,10 @@ export interface DonorState {
 
 export interface ClientState {
 	transportation_method: string;
+	coords: LatLng;
 	ethnicity: string;
 	gender: string;
+	claims?: Claim[];
 }
 
 export interface SharedProps {
@@ -17,10 +21,7 @@ export interface SharedProps {
 	address_state: string;
 	address_zip: number;
 	account_status: string;
-	coords: {
-		latitude?: number;
-		longitude?: number;
-	};
+	donations?: Donation[];
 }
 
 export interface Claim {
@@ -35,17 +36,21 @@ export interface Claim {
 }
 
 export interface Donation {
-	food_name: string;
-	measurement: string;
-	per_person: number;
-	total_servings: number;
+	canceled: boolean;
+	claims?: Claim[];
+	coords: LatLng;
+	created_at: Date;
+	distance: number;
 	donor_id: number;
 	duration_minutes: number;
+	food_name: string;
 	image_url: string;
-	created_at: Date;
-	updated_at: Date;
-	canceled: boolean;
+	measurement: string;
+	organization_name: string;
+	per_person: number;
 	pickup_location: string;
+	total_servings: number;
+	updated_at: Date;
 }
 
 export interface InitialState {
@@ -54,10 +59,11 @@ export interface InitialState {
 	loginUrl: string;
 	jwt?: string;
 	user?: DonorState | ClientState | SharedProps;
-	donationsOrClaims?: Donation[] | Claim[];
+	donations?: Donation[];
+	claims?: Claim[];
 	mapOrListView?: 'map' | 'list';
 }
 
 export interface StatusCode {
-	code: 200 | 202 | 400 | 403 | 404 | 418 | 500;
+	code: 200 | 202 | 400 | 403 | 404 | 406 | 418 | 422 | 500;
 }

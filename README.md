@@ -120,7 +120,7 @@ There are some excellent usage samples by the author [here](https://codesandbox.
 
 1. Set `counter: 0` in `initialState`.
 2. Create a new file in `@state/actions`, for example `increase.ts`.  (No imports are required.)
-3. The hook passes the store to the function when your action is called, so that will always be the first argument in your new action.  Your `store` includes the `setState` function.  The action can be written as below.
+3. The hook passes the store to the action when it is called, so that will always be the your action function's first argument.  Your `store` includes the `setState` function.  An example action, which increments the counter, is below.
 ```ts
 export const increase = async (store, amount) => {
 	await store.setState({
