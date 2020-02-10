@@ -1,28 +1,32 @@
 import React from 'react';
 import { useNavigation } from 'react-navigation-hooks';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Donation } from '@state/index.types';
+import { Donor } from '@state/index.types';
+import getTimeLeftInMinutes from '@util/getTimeLeftInMinutes';
+import truncateText from '@util/truncateText';
 import { SvgImage } from '@elements';
 import styles from './MapMarker.styles';
 
-export default ({
-	created_at,
-	distance,
-	duration_minutes,
-	food_name,
-	organization_name,
-}: Donation) => {
-	const startTime = new Date(created_at);
-	const now = new Date();
-	const minutesElapsed = Math.round((now.getTime() - startTime.getTime()) / 1000 / 60);
-	const timeLeft = minutesElapsed < duration_minutes
-		? duration_minutes - minutesElapsed
-		: 0;
-
-	const truncateText = text => {
-		const maxCharacters = 10;
-		return text ? `${text.slice(0, maxCharacters)}${text.length > maxCharacters ? '...' : ''}` : '?';
+export default ({ donor }: { donor: Donor }) => {
+	const markerText = {
+		topText: '',
+		bottomText: '',
 	};
+
+	switch (donor.donations.length) {
+		case 0: return <></>;
+		case 1: {
+			const { created_at, duration_minutes, food_name } = donor.donations[0];
+			const timeLeft = getTimeLeftInMinutes({ created_at, duration_minutes });
+			markerText.topText = truncateText(food_name);
+			markerText.bottomText = truncateText(`${timeLeft} • ${donor.distance}`);
+			break;
+		}
+		default: {
+			markerText.topText = `${donor.donations.length} DONATIONS`;
+			markerText.bottomText = donor.organization_name;
+		}
+	}
 
 	return (
 		<TouchableOpacity>
@@ -31,9 +35,8 @@ export default ({
 					<SvgImage source={require('@assets/icons/ICON_LOGO.svg')} style={styles.icon} />
 				</View>
 				<View style={styles.textContainer}>
-					<Text style={styles.foodNameText}>{truncateText(organization_name)}</Text>
-					<Text style={styles.foodNameText}>{truncateText(food_name)}</Text>
-					<Text style={styles.donationInfoText}>{truncateText(`${timeLeft} • ${distance}`)}</Text>
+					<Text style={styles.topText}>{markerText.topText}</Text>
+					<Text style={styles.bottomText}>{markerText.bottomText}</Text>
 				</View>
 			</View>
 		</TouchableOpacity>

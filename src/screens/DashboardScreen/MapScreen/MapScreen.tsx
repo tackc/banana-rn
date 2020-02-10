@@ -17,8 +17,8 @@ export default () => {
 	const map = useRef<MapView | null>(null);
 	const [ state, actions ] = useGlobal() as any;
 	const { user: { coords }, donations } = state;
-	const [ hasUserLocation, setHasUserLocation ] = useState<boolean>(!!coords);
 	const [ hasActiveDonations, setHasActiveDonations ] = useState<boolean>(donations.length > 0);
+	const [ hasUserLocation, setHasUserLocation ] = useState<boolean>(!!coords);
 	const { getLocation, getActiveDonationsForClient } = actions;
 
 	const animateTo = ({ latitude, longitude }: LatLng) => {
@@ -40,8 +40,8 @@ export default () => {
 	};
 
 	const getActiveDonations = async () => {
-		const newDonations = await getActiveDonationsForClient();
-		await setHasActiveDonations(newDonations !== []);
+		const hasDonations = await getActiveDonationsForClient();
+		await setHasActiveDonations(hasDonations);
 	};
 
 	useEffect(() => {
@@ -67,11 +67,12 @@ export default () => {
 					style={styles.mapView}
 					rotateEnabled={false}
 				>
-					{ hasActiveDonations && donations.map(donation => (
-						<Marker coordinate={donation.coords} key={donation.created_at}>
-							<MapMarker {...donation} />
-						</Marker>
-					))}
+					{ hasActiveDonations && (
+						Object.entries(donations).map(donor => (
+							<Marker coordinate={donor[0].coords} key={Object.keys(donor)[0]}>
+								<MapMarker donor={donor} />
+							</Marker>
+						)))}
 				</MapView>
 			)}
 			<View style={styles.header}>

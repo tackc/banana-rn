@@ -16,6 +16,7 @@ export const initialState: InitialState = {
 	userIdentity: USER_IDENTITY,
 	apiBaseUrl: API_BASE_URL,
 	loginUrl: LOGIN_URL,
+	donorAddresses: [],
 	donations: [],
 	claims: [],
 	jwt: undefined,

@@ -1,38 +1,37 @@
 import { LatLng } from 'react-native-maps';
 
 export interface DonorState {
-	organization_name: string;
 	business_license: string;
+	organization_name: string;
 }
 
 export interface ClientState {
-	transportation_method: string;
+	claims?: Claim[];
 	coords: LatLng;
 	ethnicity: string;
 	gender: string;
-	claims?: Claim[];
 }
 
 export interface SharedProps {
-	email: string;
-	password: string;
+	account_status: string;
 	address_street: string;
 	address_city: string;
 	address_state: string;
 	address_zip: number;
-	account_status: string;
 	donations?: Donation[];
+	email: string;
+	password: string;
 }
 
 export interface Claim {
+	canceled: boolean;
 	client_id: number;
-	donation_id: number;
-	qr_code: string;
 	completed: boolean;
 	created_at: Date;
-	updated_at: Date;
+	donation_id: number;
+	qr_code: string;
 	time_claimed: Date;
-	canceled: boolean;
+	updated_at: Date;
 }
 
 export interface Donation {
@@ -40,7 +39,6 @@ export interface Donation {
 	claims?: Claim[];
 	coords: LatLng;
 	created_at: Date;
-	distance: number;
 	donor_id: number;
 	duration_minutes: number;
 	food_name: string;
@@ -53,15 +51,25 @@ export interface Donation {
 	updated_at: Date;
 }
 
+export interface Donor {
+	address: string;
+	donations: Donation[];
+	latitude: number;
+	longitude: number;
+	organization_name: string;
+	distance: number;
+}
+
 export interface InitialState {
-	userIdentity: 'donor' | 'client';
 	apiBaseUrl: string;
+	claims?: Claim[];
+	donations?: Donation[];
+	donorAddresses?: string[];
 	loginUrl: string;
 	jwt?: string;
-	user?: DonorState | ClientState | SharedProps;
-	donations?: Donation[];
-	claims?: Claim[];
 	mapOrListView?: 'map' | 'list';
+	user?: DonorState | ClientState | SharedProps;
+	userIdentity: 'donor' | 'client';
 }
 
 export interface StatusCode {

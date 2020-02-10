@@ -21,12 +21,12 @@ export default StyleSheet.create({
 		width: 150,
 		marginLeft: 5,
 	},
-	foodNameText: {
+	topText: {
 		fontFamily: 'open-sans-bold',
 		fontSize: 14,
 		color: colors.NAVY_BLUE,
 	},
-	donationInfoText: {
+	bottomText: {
 		fontFamily: 'open-sans-regular',
 		fontSize: 14,
 		color: colors.NAVY_BLUE,
