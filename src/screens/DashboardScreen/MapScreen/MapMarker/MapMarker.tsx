@@ -13,7 +13,7 @@ export default ({ donor }: { donor: Donor }) => {
 		bottomText: '',
 	};
 
-	switch (donor.donations.length) {
+	switch (donor.donations?.length) {
 		case 0: return <></>;
 		case 1: {
 			const { created_at, duration_minutes, food_name } = donor.donations[0];

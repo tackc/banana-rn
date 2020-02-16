@@ -7,7 +7,7 @@ export interface DonorState {
 
 export interface ClientState {
 	claims?: Claim[];
-	coords: LatLng;
+	coords?: LatLng;
 	ethnicity: string;
 	gender: string;
 }
@@ -68,7 +68,7 @@ export interface InitialState {
 	loginUrl: string;
 	jwt?: string;
 	mapOrListView?: 'map' | 'list';
-	user?: DonorState | ClientState | SharedProps;
+	user: DonorState | ClientState | SharedProps | {};
 	userIdentity: 'donor' | 'client';
 }
 

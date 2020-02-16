@@ -9,13 +9,9 @@ import DashboardScreen from '../DashboardScreen';
 
 export default () => {
 	const [ state, actions ] = useGlobal() as any;
-	const { user = {} as any, jwt = '', userIdentity } = state;
+	const { user = {} as any, jwt = '' } = state;
 	const { id } = user;
 	const { getLocation } = actions;
-
-	// if (userIdentity === 'client') {
-	// 	getLocation();
-	// }
 
 	if (!jwt || !user) { return <Text>Loading...</Text>; }
 

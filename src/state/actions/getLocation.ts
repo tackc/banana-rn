@@ -8,15 +8,17 @@ export const getLocation = async store => {
 		try {
 			const location = await getLastKnownPositionAsync();
 			if (location) {
-				const { latitude, longitude } = location?.coords;
-				await store.setState({ user: { ...store.state.user, coords: { latitude, longitude } } });
-				return { latitude, longitude };
+				const { coords } = location;
+				const user = { ...store.state.user, coords };
+				// await store.setState({ user });
+				return coords;
 			}
 		} catch (error) {
 			console.error(error);
 		}
 	}
 	const coords = { latitude: null, longitude: null };
-	await store.setState({ user: { ...store.state.user, coords } });
+	const user = { ...store.state.user, coords };
+	// await store.setState({ user });
 	return coords;
 };

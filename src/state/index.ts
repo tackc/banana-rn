@@ -20,7 +20,7 @@ export const initialState: InitialState = {
 	donations: [],
 	claims: [],
 	jwt: undefined,
-	user: undefined,
+	user: {},
 	mapOrListView: 'map',
 };
 

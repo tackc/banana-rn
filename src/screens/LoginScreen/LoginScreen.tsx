@@ -21,14 +21,14 @@ import {
 } from '@elements';
 import styles from './LoginScreen.styles';
 
-const registerForPushNotificationsAsync = async () => {
-	const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-	if (status !== 'granted') {
-		Alert.alert('No notification permissions!');
-		return;
-	}
-	const token = await Notifications.getExpoPushTokenAsync();
-};
+// const registerForPushNotificationsAsync = async () => {
+// 	const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+// 	if (status !== 'granted') {
+// 		Alert.alert('No notification permissions!');
+// 		return;
+// 	}
+// 	const token = await Notifications.getExpoPushTokenAsync();
+// };
 
 export default () => {
 	const { navigate } = useNavigation();
@@ -45,7 +45,7 @@ export default () => {
 
 	const handleLogin = async () => {
 		setIsLoggingIn(true);
-		registerForPushNotificationsAsync();
+		// registerForPushNotificationsAsync();
 		const statusCode = await logIn({ email, password });
 		switch (statusCode) {
 			case 202: {

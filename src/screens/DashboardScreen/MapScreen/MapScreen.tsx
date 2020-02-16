@@ -16,10 +16,18 @@ import MapMarker from './MapMarker';
 export default () => {
 	const map = useRef<MapView | null>(null);
 	const [ state, actions ] = useGlobal() as any;
-	const { user: { coords }, donations } = state;
-	const [ hasActiveDonations, setHasActiveDonations ] = useState<boolean>(donations.length > 0);
-	const [ hasUserLocation, setHasUserLocation ] = useState<boolean>(!!coords);
+	const { donations } = state;
 	const { getLocation, getActiveDonationsForClient } = actions;
+	// const [ hasActiveDonations, setHasActiveDonations ] = useState<boolean>(donations?.length > 0 || false);
+	// const [ hasUserLocation, setHasUserLocation ] = useState<boolean>(!!coords);
+	const userLocation = useRef<LatLng | null>(null);
+	const hasUserLocation = useRef<boolean>(false);
+	const userDonations = useRef(null);
+	const hasActiveDonations = useRef<boolean>(donations?.length > 0 || false);
+	const [ nothing, refresh ] = useState(null);
+
+	// donations && donations !== [] && console.log(Object.entries(donations))
+	// console.log(donations)
 
 	const animateTo = ({ latitude, longitude }: LatLng) => {
 		if (latitude && longitude) {
@@ -30,36 +38,49 @@ export default () => {
 
 	const onMapReady = async () => {
 		setTimeout(() => {
-			animateTo(coords);
+			// console.log({ hasUserLocation, userLocation })
+			hasUserLocation.current && animateTo(userLocation.current);
 		}, 1000);
 	};
 
 	const getUserLocation = async () => {
+		console.log('getting location')
 		const { latitude, longitude } = await getLocation();
-		await setHasUserLocation(!!latitude && !!longitude);
+		userLocation.current = { latitude, longitude };
+		// console.log(latitude, longitude)
+		// console.log(!!latitude && !!longitude)
+		// hasUserLocation.current = !!latitude && !!longitude;
+		console.log(hasUserLocation.current)
+		refresh(null);
+		onMapReady();
 	};
 
 	const getActiveDonations = async () => {
-		const hasDonations = await getActiveDonationsForClient();
-		await setHasActiveDonations(hasDonations);
+		console.log('getting donations')
+		if (hasUserLocation.current) {
+			// const hasDonations = await getActiveDonationsForClient(userLocation.current);
+			userDonations.current = await getActiveDonationsForClient(userLocation.current);
+			// hasActiveDonations.current = hasDonations;
+			hasActiveDonations.current = !!userDonations.current;
+			console.log({ hasActiveDonations, userDonations })
+			refresh(null);
+		}
 	};
-
+	
 	useEffect(() => {
-		if (!hasUserLocation) {
+		// console.log({ hasUserLocation, hasActiveDonations })
+		if (!hasUserLocation.current) {
 			getUserLocation();
+			return;
 		}
-		if (!hasActiveDonations) {
-			getActiveDonations();
-		}
-	}, []);
+		getActiveDonations();
+	}, [ nothing ]);
 
 	return (
 		<View style={styles.outerContainer}>
-			{ hasUserLocation && (
 				<MapView
 					ref={map}
 					provider={PROVIDER_DEFAULT}
-					onMapReady={onMapReady}
 					loadingEnabled={true}
 					loadingBackgroundColor="gray"
 					loadingIndicatorColor={colors.BANANA_YELLOW}
@@ -67,14 +88,13 @@ export default () => {
 					style={styles.mapView}
 					rotateEnabled={false}
 				>
-					{ hasActiveDonations && (
+					{/* { hasActiveDonations && (
 						Object.entries(donations).map(donor => (
 							<Marker coordinate={donor[0].coords} key={Object.keys(donor)[0]}>
 								<MapMarker donor={donor} />
 							</Marker>
-						)))}
+						)))} */}
 				</MapView>
-			)}
 			<View style={styles.header}>
 				<Header includeMapNavigation={true} showBackButton={false} />
 				<Title text="Donations" />

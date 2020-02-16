@@ -18,7 +18,7 @@ export const logIn = async (store, { email, password }) => {
 		const e = error.toString().toLowerCase().split(' status code ');
 		return e.length > 1
 			? parseInt(e.slice(-1), 10)
-			: 418;
+			: JSON.stringify(error);
 	}
 };
 
