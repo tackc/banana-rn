@@ -9,16 +9,13 @@ import {
 	Header,
 	Title,
 } from '@elements';
-import * as colors from '@util/colors';
 import styles from './MapScreen.styles';
 import MapMarker from './MapMarker';
 
 export default () => {
 	const map = useRef<MapView | null>(null);
 	const [ state, actions ] = useGlobal() as any;
-	const { user: { coords }, donations } = state;
-	const [ hasActiveDonations, setHasActiveDonations ] = useState<boolean>(donations.length > 0);
-	const [ hasUserLocation, setHasUserLocation ] = useState<boolean>(!!coords);
+	const { user: { coords, hasCoords, hasDonations }, donations } = state;
 	const { getLocation, getActiveDonationsForClient } = actions;
 
 	const animateTo = ({ latitude, longitude }: LatLng) => {
@@ -28,53 +25,38 @@ export default () => {
 		}
 	};
 
-	const onMapReady = async () => {
+	const onMapReady = () => {
 		setTimeout(() => {
 			animateTo(coords);
 		}, 1000);
 	};
 
-	const getUserLocation = async () => {
-		const { latitude, longitude } = await getLocation();
-		await setHasUserLocation(!!latitude && !!longitude);
-	};
-
-	const getActiveDonations = async () => {
-		const hasDonations = await getActiveDonationsForClient();
-		await setHasActiveDonations(hasDonations);
-	};
-
 	useEffect(() => {
-		if (!hasUserLocation) {
-			getUserLocation();
-		}
-		if (!hasActiveDonations) {
-			getActiveDonations();
-		}
+		hasCoords
+			? getActiveDonationsForClient()
+			: getLocation();
 	}, []);
 
 	return (
 		<View style={styles.outerContainer}>
-			{ hasUserLocation && (
+			{/* { hasUserLocation && ( */}
 				<MapView
 					ref={map}
 					provider={PROVIDER_DEFAULT}
 					onMapReady={onMapReady}
 					loadingEnabled={true}
-					loadingBackgroundColor="gray"
-					loadingIndicatorColor={colors.BANANA_YELLOW}
 					showsUserLocation={true}
 					style={styles.mapView}
 					rotateEnabled={false}
 				>
-					{ hasActiveDonations && (
-						Object.entries(donations).map(donor => (
-							<Marker coordinate={donor[0].coords} key={Object.keys(donor)[0]}>
+					{ hasDonations && donations?.length && (
+						donations.map(donor => (
+							<Marker coordinate={donor[1].coords} key={donor[0]}>
 								<MapMarker donor={donor} />
 							</Marker>
 						)))}
 				</MapView>
-			)}
+			{/* )} */}
 			<View style={styles.header}>
 				<Header includeMapNavigation={true} showBackButton={false} />
 				<Title text="Donations" />

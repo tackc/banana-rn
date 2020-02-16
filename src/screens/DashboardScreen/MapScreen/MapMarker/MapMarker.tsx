@@ -8,23 +8,24 @@ import { SvgImage } from '@elements';
 import styles from './MapMarker.styles';
 
 export default ({ donor }: { donor: Donor }) => {
+	const { donations, distance, organization_name } = donor[1];
 	const markerText = {
 		topText: '',
 		bottomText: '',
 	};
 
-	switch (donor.donations.length) {
+	switch (donations.length) {
 		case 0: return <></>;
 		case 1: {
-			const { created_at, duration_minutes, food_name } = donor.donations[0];
+			const { created_at, duration_minutes, food_name } = donations[0];
 			const timeLeft = getTimeLeftInMinutes({ created_at, duration_minutes });
 			markerText.topText = truncateText(food_name);
-			markerText.bottomText = truncateText(`${timeLeft} • ${donor.distance}`);
+			markerText.bottomText = truncateText(`${timeLeft} • ${distance}`);
 			break;
 		}
 		default: {
-			markerText.topText = `${donor.donations.length} DONATIONS`;
-			markerText.bottomText = donor.organization_name;
+			markerText.topText = `${donations.length} ITEMS`;
+			markerText.bottomText = truncateText(organization_name);
 		}
 	}
 

@@ -9,7 +9,6 @@ const {
 	USER_IDENTITY,
 	API_BASE_URL,
 	LOGIN_URL,
-	MAP_OR_LIST_VIEW,
 } = getEnv() as any;
 
 export const initialState: InitialState = {

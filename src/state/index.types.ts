@@ -6,8 +6,12 @@ export interface DonorState {
 }
 
 export interface ClientState {
-	claims?: Claim[];
-	coords: LatLng;
+	claims: Claim[] | [];
+	coords?: LatLng;
+	hasCoords: boolean;
+	lastCoordsCheck: Date;
+	hasDonations: boolean;
+	lastDonationCheck: Date;
 	ethnicity: string;
 	gender: string;
 }

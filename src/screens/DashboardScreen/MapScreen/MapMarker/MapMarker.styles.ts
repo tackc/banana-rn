@@ -9,8 +9,11 @@ export default StyleSheet.create({
 	},
 	iconContainer: {
 		width: iconSize,
+		height: iconSize,
 		backgroundColor: colors.NAVY_BLUE,
 		borderRadius: iconSize / 2,
+		borderWidth: 1.5,
+		borderColor: 'white',
 	},
 	icon: {
 		// width: iconSize * 2,
