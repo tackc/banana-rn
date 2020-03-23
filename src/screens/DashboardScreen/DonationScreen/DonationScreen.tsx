@@ -6,7 +6,10 @@ import {
 	TouchableOpacity,
 	Image,
 	Alert,
+	Picker,
+	ScrollView,
 } from 'react-native';
+import ModalDropdown from 'react-native-modal-dropdown';
 import { Switch } from 'react-native-paper';
 import useGlobal from '@state';
 import {
@@ -29,39 +32,47 @@ export default () => {
 	const donationId = useNavigationParam('id') || null;
 
 	const {
+		amount_per_serving = '',
 		claims = '',
 		created_at = new Date(),
 		duration_minutes = 60,
 		food_name = '',
+		food_category = '',
 		image_url = '',
-		measurement = '',
-		per_person = '',
 		pickup_location = state.user.pickup_location || '',
+		pickup_instructions = state.user.pickup_instructions || '',
+		price_per_serving = '',
 		total_servings = '',
 	} = donation || {};
 
 	const [ name, setName ] = useState(food_name);
+	const [ category, setCategory ] = useState(food_category);
 	const [ durationInMinutes, setDurationInMinutes ] = useState(60);
+	const [ amountPerServing, setAmountPerServing ] = useState(amount_per_serving);
 	const [ totalServings, setTotalServings ] = useState(total_servings);
-	const [ servingName, setServingName ] = useState(measurement);
-	const [ perPerson, setPerPerson ] = useState(per_person);
+	const [ pricePerServing, setPricePerServing ] = useState(price_per_serving);
 	const [ pickupLocation, setPickupLocation ] = useState(pickup_location);
+	const [ pickupInstructions, setPickupInstructions ] = useState(pickup_instructions);
+
 	const [ cancel, setCancel ] = useState(false);
 	const [ stop, setStop ] = useState(false);
 
 	const icon = require('@assets/images/banana-icon.png');
 
+	const bread = "bread";
+
 	const submitDonation = async () => {
 		if (!name) { Alert.alert('Please add the name of your donation.'); return; }
 		if (/[^a-z\s]/i.test(name)) { Alert.alert('Please enter a donation name with letters only.'); return; }
-		if (!servingName) { Alert.alert('Please add a serving name.'); return; }
-		if (/[^a-z\s]/i.test(servingName)) { Alert.alert('Please enter a serving name with letters only.'); return; }
+		if (!amountPerServing || perPerson < 0) { Alert.alert('Please add an amount (at least one) per person.'); return; }
 		if (!totalServings || totalServings < 0) { Alert.alert('Please add at least one total serving.'); return; }
-		if (!perPerson || perPerson < 0) { Alert.alert('Please add at least one per person.'); return; }
+		if (!pricePerServing || pricePerServing < 0) { Alert.alert('Please add a positive dollar amount.'); return; }
 		if (!pickupLocation) { Alert.alert('Please enter a pickup location.'); return; }
+		if (!pickupInstructions) { Alert.alert('Please enter pickup instructions.'); return; }
 
 		const donationProps = {
-			donationId, donorId: user.id, jwt, name, durationInMinutes, totalServings, servingName, perPerson, pickupLocation, cancel,
+			donationId, donorId: user.id, jwt, name, category, durationInMinutes, amountPerServing, totalServings, pricePerServing,
+			pickupLocation, pickupInstructions, cancel,
 		};
 		if (!donationId) { delete donationProps.donationId; }
 		const statusCode = await postDonation(donationProps);
@@ -84,25 +95,25 @@ export default () => {
 	};
 
 	return (
+		<ScrollView>
 		<View style={styles.outerContainer}>
 			<View>
 				<Header showMenu={false} />
 				<SpacerInline height={20} />
 
-				<View style={styles.iconRow}>
-					<View style={styles.iconContainer}>
-						<Image source={icon} style={styles.icon} />
-					</View>
-					<FormTextInput
-						text="Donating:"
-						value={name}
-						setValue={setName}
-						width="50%"
-					/>
+				<View style={styles.iconContainer}>
+					<Image source={icon} style={styles.icon} />
 				</View>
 
 				<SpacerInline height={40} />
 				<View>
+					<FormTextInput
+						text="Donating:"
+						value={name}
+						setValue={setName}
+					/>
+					<InputLabel text="Category" />
+					<ModalDropdown options={['option 1', 'option 2']}/>
 					<InputLabel text="Time limit" />
 					<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
 						<TouchableOpacity
@@ -127,44 +138,34 @@ export default () => {
 					</View>
 					<SpacerInline height={20} />
 
-					<Text style={styles.infoText}>
-						How are they divided up?
-					</Text>
-
 					<FormTextInput
-						text="Serving name (bunch, etc.)"
-						value={servingName}
-						setValue={setServingName}
-						inline={true}
-						width="40%"
-						upperCase={false}
+						text="Item amount per serving"
+						value={amountPerServing && amountPerServing.toString()}
+						setValue={setAmountPerServing}
 					/>
 
 					<FormTextInput
-						text="# per person"
-						value={perPerson && perPerson.toString()}
-						setValue={setPerPerson}
-						inline={true}
-						width="20%"
-						upperCase={false}
-					/>
-
-					<FormTextInput
-						text="Total # of servings"
+						text="Total servings"
 						value={totalServings && totalServings.toString()}
 						setValue={setTotalServings}
-						inline={true}
-						width="20%"
-						upperCase={false}
 					/>
 
 					<FormTextInput
-						text="Pickup spot"
+						text="Price per serving"
+						value={pricePerServing && pricePerServing.toString()}
+						setValue={setPricePerServing}
+					/>
+
+					<FormTextInput
+						text="Pickup Address"
 						value={pickupLocation}
 						setValue={setPickupLocation}
-						inline={true}
-						width="60%"
-						upperCase={false}
+					/>
+
+					<FormTextInput
+						text="Pickup instructions"
+						value={pickupInstructions}
+						setValue={setPickupInstructions}
 					/>
 				</View>
 			</View>
@@ -209,5 +210,6 @@ export default () => {
 				<SpacerInline height={40} />
 			</View>
 		</View>
+		</ScrollView>
 	);
 };
