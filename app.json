@@ -24,8 +24,8 @@
       "**/*"
     ],
     "ios": {
-			"supportsTablet": true,
-			"bundleIdentifier": "com.thebegoodproject.org.bananaapp"
+      "supportsTablet": true,
+      "bundleIdentifier": "com.thebegoodproject.org.bananaapp"
     },
     "userInterfaceStyle": "automatic",
     "packagerOpts": {
@@ -45,6 +45,9 @@
         "md"
       ]
     },
-    "description": ""
-  }
+    "description": "",
+    "entryPoint": "node_modules/expo/AppEntry.js"
+  },
+  "displayName": "Banana App - Food Donation",
+  "name": "bananarn"
 }
